@@ -4,7 +4,9 @@ import Deliveryman from '../models/Deliveryman';
 
 class DeliverymanController {
   async index(req, res) {
-    const deliverymen = await Deliveryman.findAll();
+    const deliverymen = await Deliveryman.findAll({
+      where: { deleted_at: null },
+    });
 
     return res.json({ deliverymen });
   }
@@ -52,7 +54,9 @@ class DeliverymanController {
       return res.status(400).json({ error: 'Deliveryman not found' });
     }
 
-    deliveryman.destroy();
+    deliveryman.deleted_at = new Date();
+
+    await deliveryman.save();
 
     return res.send();
   }
