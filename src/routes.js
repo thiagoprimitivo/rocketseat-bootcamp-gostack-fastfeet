@@ -10,6 +10,7 @@ import RecipientController from './app/controllers/RecipientController';
 import FileController from './app/controllers/FileController';
 import DeliverymanController from './app/controllers/DeliverymanController';
 import DeliveryController from './app/controllers/DeliveryController';
+import OrderController from './app/controllers/OrderController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -18,6 +19,8 @@ const upload = multer(multerConfig);
  * Rota para criação da sessão de usuário
  */
 routes.post('/sessions', SessionController.store);
+
+routes.get('/deliveryman/:deliverymanId/deliveries', OrderController.index);
 
 /**
  * Middleware responsável por verificar se o usuário está logado no sistema
@@ -36,5 +39,6 @@ routes.delete('/deliverymen/:id', DeliverymanController.delete);
 
 routes.get('/deliveries', DeliveryController.index);
 routes.post('/deliveries', DeliveryController.store);
+routes.put('/deliveries/:id', DeliveryController.update);
 
 export default routes;

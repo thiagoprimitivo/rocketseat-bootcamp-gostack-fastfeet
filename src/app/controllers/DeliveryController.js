@@ -63,6 +63,58 @@ class DeliveryController {
 
     return res.json(delivery);
   }
+
+  async update(req, res) {
+    const schema = Yup.object().shape({
+      recipient_id: Yup.number().required(),
+      deliveryman_id: Yup.number().required(),
+      product: Yup.string().required(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    const delivery = await Delivery.findByPk(req.params.id);
+
+    if (!delivery) {
+      return res.status(400).json({ error: 'Delivery not found' });
+    }
+
+    const checkIsCanceled = await Delivery.findOne({
+      where: { id: req.params.id, canceled_at: null },
+    });
+
+    if (!checkIsCanceled) {
+      return res.status(400).json({ error: 'Delivery is canceled' });
+    }
+
+    const checkIsWithdrawn = await Delivery.findOne({
+      where: { id: req.params.id, start_date: null },
+    });
+
+    if (!checkIsWithdrawn) {
+      return res.status(400).json({ error: 'Order already withdrawn' });
+    }
+
+    const { recipient_id, deliveryman_id } = req.body;
+
+    const recipient = await Recipient.findByPk(recipient_id);
+
+    if (!recipient) {
+      return res.status(400).json({ error: 'Recipient not found' });
+    }
+
+    const deliveryman = await Deliveryman.findByPk(deliveryman_id);
+
+    if (!deliveryman) {
+      return res.status(400).json({ error: 'Deliveryman not found' });
+    }
+
+    const deliveryUpdate = await delivery.update(req.body);
+
+    return res.json(deliveryUpdate);
+  }
 }
 
 export default new DeliveryController();
