@@ -11,7 +11,7 @@ class OrderController {
 
     const { delivered } = req.query;
 
-    const entregue = Boolean(delivered);
+    const checkIsDelivered = Boolean(delivered);
 
     if (!delivered) {
       where = {
@@ -20,7 +20,7 @@ class OrderController {
         start_date: null,
         end_date: null,
       };
-    } else if (entregue) {
+    } else if (checkIsDelivered) {
       where = {
         deliveryman_id: deliverymanId,
         end_date: { [Op.ne]: null },
