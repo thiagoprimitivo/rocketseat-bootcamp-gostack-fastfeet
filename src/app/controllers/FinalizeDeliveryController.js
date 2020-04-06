@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import File from '../models/File';
 import Delivery from '../models/Delivery';
 
@@ -20,7 +21,9 @@ class FinalizeDeliveryController {
      * Checks if delivery exists
      */
 
-    const delivery = await Delivery.findByPk(id);
+    const delivery = await Delivery.findOne({
+      where: { id, start_date: { [Op.ne]: null }, end_date: { [Op.is]: null } },
+    });
 
     if (!delivery) {
       return res.status(400).json({ error: 'Delivery not found' });

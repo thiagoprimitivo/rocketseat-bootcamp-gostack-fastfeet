@@ -1,8 +1,13 @@
 import * as Yup from 'yup';
 
+import { format } from 'date-fns';
+import pt_BR from 'date-fns/locale/pt-BR';
+
 import Delivery from '../models/Delivery';
 import Recipient from '../models/Recipient';
 import Deliveryman from '../models/Deliveryman';
+
+import Mail from '../../lib/Mail';
 
 class DeliveryController {
   async index(req, res) {
@@ -45,7 +50,7 @@ class DeliveryController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { recipient_id, deliveryman_id } = req.body;
+    const { product, recipient_id, deliveryman_id } = req.body;
 
     const recipient = await Recipient.findByPk(recipient_id);
 
@@ -60,6 +65,21 @@ class DeliveryController {
     }
 
     const delivery = await Delivery.create(req.body);
+
+    await Mail.sendMail({
+      to: `${deliveryman.name} <${deliveryman.email}>`,
+      subject: 'Encomenda disponível para retirada',
+      template: 'creation',
+      context: {
+        product,
+        recipient: recipient.name,
+        address: `${recipient.street} ${recipient.house_number}, ${recipient.address_complement}, ${recipient.city}-${recipient.state}, CEP.:${recipient.zip_code}`,
+        deliveryman: deliveryman.name,
+        date: format(delivery.created_at, "dd 'de' MMMM', às ' H:mm'h'", {
+          locale: pt_BR,
+        }),
+      },
+    });
 
     return res.json(delivery);
   }
