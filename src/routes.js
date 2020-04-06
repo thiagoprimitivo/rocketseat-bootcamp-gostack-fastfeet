@@ -13,6 +13,7 @@ import DeliveryController from './app/controllers/DeliveryController';
 import OrderController from './app/controllers/OrderController';
 import RemoveOrderController from './app/controllers/RemoveOrderController';
 import FinalizeDeliveryController from './app/controllers/FinalizeDeliveryController';
+import DeliveryProblemController from './app/controllers/DeliveryProblemController';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -31,6 +32,11 @@ routes.put(
   upload.single('file'),
   FinalizeDeliveryController.update
 );
+
+routes.get('/deliveryproblems', DeliveryProblemController.index);
+routes.get('/delivery/:deliveryId/problems', DeliveryProblemController.index);
+routes.post('/delivery/:deliveryId/problems', DeliveryProblemController.store);
+routes.delete('/problem/:id/cancel-delivery', DeliveryProblemController.delete);
 
 /**
  * Middleware responsável por verificar se o usuário está logado no sistema
